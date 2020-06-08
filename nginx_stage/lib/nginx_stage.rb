@@ -81,6 +81,20 @@ module NginxStage
     end
   end
 
+  # The maximum file upload size that nginx will allow from clients
+  # @ example No maximum upload size supplied
+  #   nginx_file_upload_max #=> "10G"
+  # @ example 20G
+  #   nginx_file_upload_max #=> "20G"
+  # @return [String] Maximum upload size for nginx
+  def self.nginx_file_upload_max(default: "10G")
+    upload_max = nginx_file_upload_max
+    if nginx_file_upload_max.empty?
+      default
+    else
+      upload_max
+    end
+  end
 
   # Regex used to parse an app request
   # @example Dev app request
@@ -118,10 +132,11 @@ module NginxStage
       "ONDEMAND_PORTAL" => portal,
       "ONDEMAND_TITLE" => title,
       "SECRET_KEY_BASE" => SecretKeyBaseFile.new(user).secret,
+      "NGINX_FILE_UPLOAD_MAX" => nginx_file_upload_max(),
       # only set these if corresponding config is set in nginx_stage.yml
       "OOD_DASHBOARD_TITLE" => title(default: nil),
       "OOD_PORTAL" => portal(default: nil),
-      "OOD_DEV_APPS_ROOT" => apps_root(env: :dev, owner: user)
+      "OOD_DEV_APPS_ROOT" => apps_root(env: :dev, owner: user),
     }.merge(pun_custom_env)
   end
 
