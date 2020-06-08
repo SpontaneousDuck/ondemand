@@ -87,7 +87,7 @@ module NginxStage
   # @ example 20G
   #   nginx_file_upload_max #=> "20G"
   # @return [String] Maximum upload size for nginx
-  def self.nginx_file_upload_max(default: "10G")
+  def self.upload_max(default: "10G")
     upload_max = nginx_file_upload_max
     if nginx_file_upload_max.empty?
       default
@@ -132,7 +132,7 @@ module NginxStage
       "ONDEMAND_PORTAL" => portal,
       "ONDEMAND_TITLE" => title,
       "SECRET_KEY_BASE" => SecretKeyBaseFile.new(user).secret,
-      "NGINX_FILE_UPLOAD_MAX" => nginx_file_upload_max(),
+      "NGINX_FILE_UPLOAD_MAX" => upload_max(),
       # only set these if corresponding config is set in nginx_stage.yml
       "OOD_DASHBOARD_TITLE" => title(default: nil),
       "OOD_PORTAL" => portal(default: nil),
