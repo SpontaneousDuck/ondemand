@@ -79,14 +79,13 @@ whitelist = Array.from(new Set(whitelist)); // remove duplicates
 const default_sshhost = whitelist[0]; //default sshhost if not set
 
 wss.on('connection', function connection (ws, req) {
-  var match;
-  var host = process.env.DEFAULT_SSHHOST || default_sshhost
-  var cmd = process.env.OOD_SSH_WRAPPER || 'ssh';
-  var dir;
-  var term;
-  var args;
-  var host_path_rx = '/ssh/([^\\/\\?]+)([^\\?]+)?(\\?.*)?$';
-
+  var match,
+      dir,
+      term,
+      args,
+      host = process.env.DEFAULT_SSHHOST || default_sshhost,
+      cmd = process.env.OOD_SSH_WRAPPER || 'ssh',
+      host_path_rx = '/ssh/([^\\/\\?]+)([^\\?]+)?(\\?.*)?$';
   console.log('Connection established');
 
   // Determine host and dir from request URL
@@ -160,13 +159,12 @@ function default_server_origin(headers){
 }
 
 server.on('upgrade', function upgrade(request, socket, head) {
-  var requestToken = new URLSearchParams(url.parse(request.url).search).get('csrf'),
-      client_origin = request.headers['origin'],
-      server_origin = custom_server_origin(default_server_origin(request.headers));
-
-  const host_path_rx = '/ssh/([^\\/\\?]+)([^\\?]+)?(\\?.*)?$';
-  const match = request.url.match(host_path_rx);
-  const host_in_whitelist = whitelist.includes(match[1]);
+  const requestToken = new URLSearchParams(url.parse(request.url).search).get('csrf'),
+        client_origin = request.headers['origin'],
+        server_origin = custom_server_origin(default_server_origin(request.headers)),
+        host_path_rx = '/ssh/([^\\/\\?]+)([^\\?]+)?(\\?.*)?$', 
+        match = request.url.match(host_path_rx), 
+        host_in_whitelist = whitelist.includes(match[1]);
 
   if (client_origin &&
       client_origin.startsWith('http') &&
