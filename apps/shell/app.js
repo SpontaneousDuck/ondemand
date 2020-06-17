@@ -12,6 +12,7 @@ const yaml      = require('js-yaml');
 const glob      = require("glob");
 const port      = 3000;
 const log       = console.log;
+const host_path_rx = '/ssh/([^\\/\\?]+)([^\\?]+)?(\\?.*)?$';
 
 // Read in environment variables
 dotenv.config({path: '.env.local'});
@@ -86,7 +87,6 @@ wss.on('connection', function connection (ws, req) {
       args,
       host = process.env.DEFAULT_SSHHOST || default_sshhost,
       cmd = process.env.OOD_SSH_WRAPPER || 'ssh';
-  const host_path_rx = '/ssh/([^\\/\\?]+)([^\\?]+)?(\\?.*)?$';
 
   log('Connection established');
 
@@ -164,7 +164,6 @@ server.on('upgrade', function upgrade(request, socket, head) {
   const requestToken = new URLSearchParams(url.parse(request.url).search).get('csrf'),
         client_origin = request.headers['origin'],
         server_origin = custom_server_origin(default_server_origin(request.headers)),
-        host_path_rx = '/ssh/([^\\/\\?]+)([^\\?]+)?(\\?.*)?$', 
         match = request.url.match(host_path_rx), 
         host_in_whitelist = whitelist.includes(match[1]);
 
