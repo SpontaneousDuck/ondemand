@@ -11,6 +11,7 @@ const url       = require('url');
 const yaml      = require('js-yaml');
 const glob      = require("glob");
 const port      = 3000;
+const log       = console.log;
 
 // Read in environment variables
 dotenv.config({path: '.env.local'});
@@ -82,11 +83,11 @@ wss.on('connection', function connection (ws, req) {
   var match,
       dir,
       term,
-      args,
-      host = process.env.DEFAULT_SSHHOST || default_sshhost,
-      cmd = process.env.OOD_SSH_WRAPPER || 'ssh',
-      host_path_rx = '/ssh/([^\\/\\?]+)([^\\?]+)?(\\?.*)?$';
-  console.log('Connection established');
+      args;
+  const host = process.env.DEFAULT_SSHHOST || default_sshhost,
+        cmd = process.env.OOD_SSH_WRAPPER || 'ssh',
+        host_path_rx = '/ssh/([^\\/\\?]+)([^\\?]+)?(\\?.*)?$';
+  log('Connection established');
 
   // Determine host and dir from request URL
   if (match = req.url.match(process.env.PASSENGER_BASE_URI + host_path_rx)) {
@@ -104,11 +105,11 @@ wss.on('connection', function connection (ws, req) {
     rows: 30
   });
 
-  console.log('Opened terminal: ' + term.pid);
+  log('Opened terminal: ' + term.pid);
 
   term.on('data', function (data) {
     ws.send(data, function (error) {
-      if (error) console.log('Send error: ' + error.message);
+      if (error) log('Send error: ' + error.message);
     });
   });
 
@@ -128,7 +129,7 @@ wss.on('connection', function connection (ws, req) {
 
   ws.on('close', function () {
     term.end();
-    console.log('Closed terminal: ' + term.pid);
+    log('Closed terminal: ' + term.pid);
   });
 });
 
@@ -206,5 +207,5 @@ server.on('upgrade', function upgrade(request, socket, head) {
 });
 
 server.listen(port, function () {
-  console.log('Listening on ' + port);
+  log('Listening on ' + port);
 });
