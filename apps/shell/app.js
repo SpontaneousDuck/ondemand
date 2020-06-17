@@ -83,10 +83,11 @@ wss.on('connection', function connection (ws, req) {
   var match,
       dir,
       term,
-      args;
-  const host = process.env.DEFAULT_SSHHOST || default_sshhost,
-        cmd = process.env.OOD_SSH_WRAPPER || 'ssh',
-        host_path_rx = '/ssh/([^\\/\\?]+)([^\\?]+)?(\\?.*)?$';
+      args,
+      host = process.env.DEFAULT_SSHHOST || default_sshhost,
+      cmd = process.env.OOD_SSH_WRAPPER || 'ssh';
+  const host_path_rx = '/ssh/([^\\/\\?]+)([^\\?]+)?(\\?.*)?$';
+
   log('Connection established');
 
   // Determine host and dir from request URL
