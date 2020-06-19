@@ -11,7 +11,6 @@ const url       = require('url');
 const yaml      = require('js-yaml');
 const glob      = require("glob");
 const port      = 3000;
-const log       = console.log;
 const host_path_rx = '/ssh/([^\\/\\?]+)([^\\?]+)?(\\?.*)?$';
 
 // Read in environment variables
@@ -59,9 +58,9 @@ app.use(process.env.PASSENGER_BASE_URI || '/', router);
 const server = new http.createServer(app);
 const wss = new WebSocket.Server({ noServer: true });
 
-let whitelist = [];
+let host_whitelist = [];
 if (process.env.SSHHOST_WHITELIST){
-  whitelist = process.env.SSHHOST_WHITELIST.split(':');
+  host_whitelist = process.env.SSHHOST_WHITELIST.split(':');
 }
 
 glob.sync('/etc/ood/config/clusters.d/*.y*ml')
@@ -71,14 +70,15 @@ glob.sync('/etc/ood/config/clusters.d/*.y*ml')
     let host = config.v2.login.host; //Already did checking above
     let isDefault = config.v2.login.default;
     if(isDefault){
-      whitelist.unshift(host);
+      host_whitelist.unshift(host);
     } else{
-      whitelist.push(host);
+      host_whitelist.push(host);
     }
   });
+host_whitelist.push('default');
 
-whitelist = Array.from(new Set(whitelist)); // remove duplicates
-const default_sshhost = whitelist[0]; //default sshhost if not set
+host_whitelist = Array.from(new Set(host_whitelist)); // remove duplicates
+const default_sshhost = host_whitelist[0]; //default sshhost if not set
 
 wss.on('connection', function connection (ws, req) {
   var match,
@@ -88,7 +88,7 @@ wss.on('connection', function connection (ws, req) {
       host = process.env.DEFAULT_SSHHOST || default_sshhost,
       cmd = process.env.OOD_SSH_WRAPPER || 'ssh';
 
-  log('Connection established');
+  console.log('Connection established');
 
   // Determine host and dir from request URL
   if (match = req.url.match(process.env.PASSENGER_BASE_URI + host_path_rx)) {
@@ -106,11 +106,11 @@ wss.on('connection', function connection (ws, req) {
     rows: 30
   });
 
-  log('Opened terminal: ' + term.pid);
+  console.log('Opened terminal: ' + term.pid);
 
   term.on('data', function (data) {
     ws.send(data, function (error) {
-      if (error) log('Send error: ' + error.message);
+      if (error) console.log('Send error: ' + error.message);
     });
   });
 
@@ -130,7 +130,7 @@ wss.on('connection', function connection (ws, req) {
 
   ws.on('close', function () {
     term.end();
-    log('Closed terminal: ' + term.pid);
+    console.log('Closed terminal: ' + term.pid);
   });
 });
 
@@ -165,7 +165,7 @@ server.on('upgrade', function upgrade(request, socket, head) {
         client_origin = request.headers['origin'],
         server_origin = custom_server_origin(default_server_origin(request.headers)),
         match = request.url.match(host_path_rx), 
-        host_in_whitelist = whitelist.includes(match[1]);
+        host_in_whitelist = host_whitelist.includes(match[1]);
 
   if (client_origin &&
       client_origin.startsWith('http') &&
@@ -207,5 +207,5 @@ server.on('upgrade', function upgrade(request, socket, head) {
 });
 
 server.listen(port, function () {
-  log('Listening on ' + port);
+  console.log('Listening on ' + port);
 });
