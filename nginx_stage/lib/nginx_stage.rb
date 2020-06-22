@@ -81,13 +81,13 @@ module NginxStage
     end
   end
 
-  # The maximum file upload size that nginx will allow from clients
+  # The maximum file upload size that nginx will allow from clients in bytes
   # @ example No maximum upload size supplied
-  #   nginx_file_upload_max #=> "10G"
-  # @ example 20G
-  #   nginx_file_upload_max #=> "20G"
+  #   nginx_file_upload_max #=> "10737420000"
+  # @ example 20 gigabyte file size upload limit
+  #   nginx_file_upload_max #=> "21474840000"
   # @return [String] Maximum upload size for nginx
-  def self.upload_max(default: "10G")
+  def self.upload_max(default: "10737420000")
     upload_max = nginx_file_upload_max
     if nginx_file_upload_max.empty?
       default

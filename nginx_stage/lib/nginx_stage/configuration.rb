@@ -67,8 +67,8 @@ module NginxStage
     # per-user NGINX configuration options
     #
 
-    # Max file upload size (e.g., 10G)
-    # @return [String] the max file size clients can upload
+    # Max file upload size (e.g., 10737420000)
+    # @return [String] the max file size clients can upload in bytes
     attr_accessor :nginx_file_upload_max
 
     # Custom environment variables to set in the PUN
@@ -468,7 +468,7 @@ module NginxStage
       self.disabled_shell = '/access/denied'
 
       self.disable_bundle_user_config = true
-      self.nginx_file_upload_max = '10G'
+      self.nginx_file_upload_max = '10737420000'
 
       read_configuration(default_config_path) if File.file?(default_config_path)
     end
