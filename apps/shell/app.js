@@ -63,7 +63,7 @@ if (process.env.SSHHOST_WHITELIST){
   host_whitelist = process.env.SSHHOST_WHITELIST.split(':');
 }
 
-glob.sync('/etc/ood/config/clusters.d/*.y*ml')
+glob.sync((process.env.OOD_CLUSTERS || '/etc/ood/config/clusters.d/') + '*.y*ml')
   .map(yml => yaml.safeLoad(fs.readFileSync(yml)))
   .filter(config => (config.v2 && config.v2.login && config.v2.login.host) && ! (config.v2 && config.v2.metadata && config.v2.metadata.hidden))
   .forEach((config) => {
